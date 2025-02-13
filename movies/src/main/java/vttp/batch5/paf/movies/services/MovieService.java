@@ -1,8 +1,15 @@
 package vttp.batch5.paf.movies.services;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -15,6 +22,17 @@ import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.json.data.JsonDataSource;
+import net.sf.jasperreports.pdf.JRPdfExporter;
+import net.sf.jasperreports.pdf.SimplePdfExporterConfiguration;
+import net.sf.jasperreports.pdf.SimplePdfReportConfiguration;
 import vttp.batch5.paf.movies.constants.CollectionNames;
 import vttp.batch5.paf.movies.repositories.MongoMovieRepository;
 import vttp.batch5.paf.movies.repositories.MySQLMovieRepository;
@@ -137,8 +155,34 @@ public class MovieService {
   // TODO: Task 4
   // You may change the signature of this method by passing any number of parameters
   // and returning any type
-  public void generatePDFReport() {
+  public void generatePDFReport() throws FileNotFoundException, JRException {
+    Path p = Paths.get("src/main/resources/static/director_movies_report.jrxml");
 
+    JsonDataSource reportDS = new JsonDataSource(new File("report.pdf"));
+
+    JsonDataSource directorsDS = new JsonDataSource(p.toFile());
+
+    Map<String, Object> params = new HashMap<>();
+    params.put("DIRECTOR_TABLE_DATASET", directorsDS);
+
+    InputStream reportStream = getClass().getResourceAsStream(p.toString());
+    JasperReport report = JasperCompileManager.compileReport(reportStream);
+
+    JasperPrint print = JasperFillManager.fillReport(report, params, reportDS);
+
+    JRPdfExporter exporter = new JRPdfExporter();
+    exporter.setExporterInput(new SimpleExporterInput(print));
+    exporter.setExporterOutput(new SimpleOutputStreamExporterOutput("employeeReport.pdf"));
+    SimplePdfReportConfiguration reportConfig = new SimplePdfReportConfiguration();
+
+    reportConfig.setSizePageToContent(true);
+    reportConfig.setForceLineBreakPolicy(false);
+
+    SimplePdfExporterConfiguration exportConfig = new SimplePdfExporterConfiguration();
+    exportConfig.setEncrypted(true);
+    exportConfig.setAllowedPermissionsHint("PRINTING");
+    exporter.setConfiguration(reportConfig);
+    exporter.setConfiguration(exportConfig);
+    exporter.exportReport();
   }
-
 }
