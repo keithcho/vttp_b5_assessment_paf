@@ -2,6 +2,7 @@ package vttp.batch5.paf.movies.repositories;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,17 +76,31 @@ public class MongoMovieRepository {
     // You can throw any checked exceptions from the method
     // Write the native Mongo query you implement in the method in the comments
     //
-    //    native MongoDB query here
+    //    db.errors.insert({
+    //        ids: [ 123, abc, etc ]
+    //        error: "...",
+    //        timestamp: $$NOW
+    //    })
     //
-    public void logError() {
-        
+    public void logError(List<JsonObject> movieBatch, Exception e) {
+        Map<String, Object> errorMap = new HashMap<>();
+        Date timestamp = new Date();
+        JsonArray ids = getMovieBatchIds(movieBatch);
+
+        errorMap.put("ids", ids);
+        errorMap.put("error", e.getMessage());
+        errorMap.put("timestamp", timestamp);
+
+        Document errorDoc = new Document(errorMap);
+
+        mongoTemplate.insert(errorDoc, CollectionNames.MONGO_ERRORS);
     }
     
-    private JsonArray getMovieBatchIds(List<Document> movieBatch) {
+    private JsonArray getMovieBatchIds(List<JsonObject> movieBatch) {
         JsonArrayBuilder jsonArrBldr = Json.createArrayBuilder();
         for (int i = 0; i < movieBatch.size(); i++) {
-            Document movie = movieBatch.get(i);
-            jsonArrBldr.add(movie.get("imdb_id", String.class));
+            JsonObject movie = movieBatch.get(i);
+            jsonArrBldr.add(movie.getString("imdb_id"));
         }
         return jsonArrBldr.build();
     }

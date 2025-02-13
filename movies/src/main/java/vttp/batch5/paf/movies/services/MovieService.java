@@ -51,6 +51,7 @@ public class MovieService {
             logger.info(Arrays.toString(added));
           } catch (Exception e) {
             logger.error("Error inserting into MySQL: " + e.getMessage());
+            mongoMovieRepo.logError(movieBatch, e);
           }
           
           try {
@@ -60,6 +61,7 @@ public class MovieService {
             logger.info("Inserted batch of " + movieBatch.size() + " into MongoDB");
           } catch (Exception e) {
             logger.error("Error inserting into MongoDB: " + e.getMessage());
+            mongoMovieRepo.logError(movieBatch, e);
           }
           
           // Empty list after inserting into db
@@ -79,6 +81,7 @@ public class MovieService {
       logger.info("Inserted batch of " + movieBatch.size() + " into MySQL");
     } catch (Exception e) {
       logger.error("Error inserting into MySQL: " + e.getMessage());
+      mongoMovieRepo.logError(movieBatch, e);
     }
     try {
       // Insert batch into MongoDB
@@ -87,6 +90,7 @@ public class MovieService {
       logger.info("Inserted batch of " + movieBatch.size() + " into MongoDB");
     } catch (Exception e) {
       logger.error("Error inserting into MongoDB: " + e.getMessage());
+      mongoMovieRepo.logError(movieBatch, e);
     }
   }
 
@@ -94,7 +98,7 @@ public class MovieService {
   // You may change the signature of this method by passing any number of parameters
   // and returning any type
   public JsonArray getProlificDirectors(int count) {
-    
+
     // Get top directors from MongoDB, and the list of movies they directed
     List<Document> topDirectors = mongoMovieRepo.getTopDirectorMovies(count);
 

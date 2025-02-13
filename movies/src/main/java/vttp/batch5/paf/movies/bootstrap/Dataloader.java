@@ -23,7 +23,6 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
 import jakarta.json.JsonValue;
-import vttp.batch5.paf.movies.repositories.MongoMovieRepository;
 import vttp.batch5.paf.movies.repositories.MySQLMovieRepository;
 import vttp.batch5.paf.movies.services.MovieService;
 
@@ -35,10 +34,6 @@ public class Dataloader implements CommandLineRunner {
 
   @Autowired
   MySQLMovieRepository mySQLMovieRepo;
-
-  // TODO: remove
-  @Autowired
-  MongoMovieRepository mongoMovieRepository;
 
   Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
@@ -104,5 +99,4 @@ public class Dataloader implements CommandLineRunner {
     String[] dateArr = releaseDate.split("-");
     return Integer.parseInt(dateArr[0]) >= filterYear;
   }
-
 }
