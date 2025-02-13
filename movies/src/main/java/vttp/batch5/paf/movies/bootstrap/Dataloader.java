@@ -59,7 +59,7 @@ public class Dataloader implements CommandLineRunner {
 
   private List<JsonObject> loadJson() throws IOException {
     logger.info("Loading ZIP file");
-    Path p = Paths.get("/Users/keith/Documents/localdev/keithcho/Assessments/paf_b5_assessment_template/data/movies_post_2010.zip");
+    Path p = Paths.get("src/main/resources/static/movies_post_2010.zip");
     ZipFile zipFile = new ZipFile(p.toFile());
     Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
