@@ -2,11 +2,11 @@ FROM eclipse-temurin:23-noble AS builder
 
 WORKDIR /src
 
-COPY mvnw .
-COPY pom.xml .
+COPY movies/mvnw .
+COPY movies/pom.xml .
 
-COPY .mvn .mvn
-COPY src src
+COPY movies/.mvn .mvn
+COPY movies/src src
 
 RUN chmod a+x mvnw && ./mvnw package -Dmaven.test.skip=true
 
